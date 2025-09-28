@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <title>My Cart</title>
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/button-styles.css">
     <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  
-  <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
 
 </head>
 <body>
      <header>
   <div class="nav-container">
-    <div class="logo">MiniMart</div>
+    <div class="logo" id="logo">MiniMart</div>
 
     <div class="nav-main">
       <div class="categories">
@@ -33,8 +32,8 @@
       </div>
 
       <div class="nav-icons">
-        <i class="fa-regular fa-heart" id="nav-cart"></i>
-        <i class="fa-solid fa-cart-shopping" id="nav-heart" ></i>
+        <i class="fa-regular fa-heart" id="nav-heart"></i>
+        <i class="fa-solid fa-cart-shopping" id="nav-cart"></i>
       </div>
     </div>
   </div>
@@ -42,13 +41,9 @@
 
   <main id="products-container"></main>
 
-  <script src="./js/script.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchProducts().then(() => {
-        renderCartPage();
-      });
-    });
-  </script>
+  <script src="./js/common.js"></script>
+  <script src="./js/cart-wishlist.js"></script>
+  <script src="./js/rendering.js"></script>
+  <script src="./js/cart.js"></script>
 </body>
 </html>

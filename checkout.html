@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MiniMart</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/checkout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">MiniMart</a>
+            <div class="nav-main">
+                <div class="categories">
+                    <button class="category-btn" data-category="jewelery">JEWELRY</button>
+                    <button class="category-btn" data-category="electronics">ELECTRONICS</button>
+                    <div class="dropdown">
+                        <button class="category-btn" data-category="clothes">CLOTHES</button>
+                        <div class="dropdown-content">
+                            <button class="subcategory-btn" data-subcategory="men's clothing">MEN'S</button>
+                            <button class="subcategory-btn" data-subcategory="women's clothing">WOMEN'S</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-wrapper">
+                    <input type="search" id="search" placeholder="Search products...">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </div>
+
+                <div class="nav-icons">
+                    <a href="mywishlist.html"><i class="fa-regular fa-heart" id="nav-heart"><span class="badge"></span></i></a>
+                    <a href="mycart.html"><i class="fa-solid fa-cart-shopping" id="nav-cart"><span class="badge"></span></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="checkout-container">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div id="checkout-items"></div>
+            <div class="total-section">
+                <div class="subtotal">
+                    <span>Subtotal:</span>
+                    <span id="subtotal-amount">$0.00</span>
+                </div>
+                <div class="total">
+                    <span>Total:</span>
+                    <span id="total-amount">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <form id="checkout-form" class="checkout-form">
+            <h2>Shipping Information</h2>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <div class="form-group">
+                <label for="zipCode">ZIP Code</label>
+                <input type="text" id="zipCode" name="zipCode" required>
+            </div>
+            <button type="submit" class="checkout-button">Place Order</button>
+        </form>
+    </main>
+
+    <script src="./js/common.js"></script>
+    <script src="./js/cart-wishlist.js"></script>
+    <script src="./js/checkout.js" type="module"></script>
+</body>
+</html>

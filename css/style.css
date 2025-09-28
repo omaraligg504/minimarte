@@ -44,6 +44,15 @@ header {
   margin-right: 2vw;
   color: #ffffff;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-icons{
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  padding-right:10px ;
 }
 
 /* Category buttons (merged properties; later values override earlier ones) */
@@ -323,34 +332,23 @@ header {
   font-weight: bold;
 }
 
-/* Wishlist & Cart buttons */
-.wishlist-btn,
+/* Wishlist (heart) & Cart buttons */
+.heart-btn,
 .cart-btn {
-  position: absolute;
-  top: 0.5em;
   width: 2em;
   height: 2em;
   border-radius: 50%;
   border: none;
-  background-color: #2D2D2D;
-  color: #ffffff;
+  /* neutral defaults; visual states are defined in button-styles.css */
+  background-color: #f0f0f0;
+  color: #555555;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: all 0.18s ease;
 }
 
-.wishlist-btn:hover {
-  background-color: #e74c3c;
-}
-
-.cart-btn:hover {
-  background-color: #27ae60;
-}
-
-.wishlist-btn { right: 0.5em; }
+/* Positioning preserved */
+.heart-btn { right: 0.5em; }
 .cart-btn { left: 0.5em; }
 
 /* Add to Cart button at bottom */
@@ -383,17 +381,12 @@ header {
   margin: 20px 0;
   text-align: center; /* center the bar text */
 }
-.card-actions {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
+
 .card-actions i:hover {
   color: #ff5722;
 }
 .product-card {
+  position: relative;
   width: 250px;
   text-align: center;
   padding: 15px;
@@ -409,13 +402,18 @@ header {
   max-width: 100%;
   border-radius: 10px;
 }
-
 .card-actions {
+  width: 100%;
+  /* background-color: #27ae60; */
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+
 }
+
 
 .icon-btn {
   width: 45px;

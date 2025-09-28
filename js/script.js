@@ -1,74 +1,11 @@
 // script.js - responsive category carousels with subcategories + centered items
 
-const container = document.getElementById("products-container");
-const searchInput = document.getElementById("search");
-const logo = document.querySelector(".logo");
+const container = window.container;
+// Track last visible count per category so we can rotate items when narrowing
+const categoryVisibleCount = {};
 
-let products = [];
-let categoryIndices = {}; // start index per category for carousel
-let mode = "all"; // 'all' or 'category'
-let selectedCategory = null;
-let selectedSubCategory = null;
+// All of these functions are now in common.js and rendering.js
 
-const CARD_MIN_WIDTH = 280; // px - the card minimum width used for fit calculation
-const MIN_GAP = 8; // px - minimum allowed gap between items
-const MAX_GAP = 24; // px - maximum reasonable gap
-const MAX_VISIBLE = 4; // maximum items to show on wide screens
-
-// fetch products and render initial page
-async function fetchProducts() {
-  const res = await fetch("https://fakestoreapi.com/products");
-  products = await res.json();
-  renderPage();
-}
-
-function getVisibleCountForWidth(availableWidth) {
-  for (let k = MAX_VISIBLE; k >= 1; k--) {
-    if (k === 1) {
-      if (CARD_MIN_WIDTH <= availableWidth) return { visibleCount: 1, gap: 0 };
-      continue;
-    }
-    const gap = (availableWidth - k * CARD_MIN_WIDTH) / (k - 1);
-    if (gap >= MIN_GAP) {
-      return { visibleCount: k, gap: Math.min(gap, MAX_GAP) };
-    }
-  }
-  return { visibleCount: 1, gap: 0 };
-}
-
-// create HTML string for a product card
-function cardHTML(p) {
-  let wishlist = getStorage("wishlist");
-  let cart = getStorage("cart");
-
-  const inWishlist = wishlist.includes(p.id);
-  const inCart = cart.includes(p.id);
-
-  return `
-    <div class="product-card" data-id="${p.id}">
-      <img src="${p.image}" alt="${escapeHtml(p.title)}" class="product-image">
-      <h3 class="product-title">${escapeHtml(p.title)}</h3>
-      <p class="product-price">$${p.price}</p>
-      <div class="card-actions">
-        <button class="icon-btn heart-btn ${inWishlist ? "active" : ""}" data-id="${p.id}">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-        <button class="icon-btn cart-btn ${inCart ? "active" : ""}" data-id="${p.id}">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-function escapeHtml(text) {
-  return String(text)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
 
 /* ---------- Normal multi-category page (carousels) ---------- */
 function renderPage() {
@@ -128,6 +65,14 @@ function renderPage() {
     const availableWidth = Math.floor(wrapper.clientWidth);
     const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
 
+    // Rotate start index forward when visibleCount decreased so items shift
+    const prevVisible = categoryVisibleCount[category] ?? visibleCount;
+    if (visibleCount < prevVisible) {
+      const delta = prevVisible - visibleCount;
+      categoryIndices[category] = (categoryIndices[category] + delta) % items.length;
+    }
+    categoryVisibleCount[category] = visibleCount;
+
     grid.style.gap = `${gap}px`;
     grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
 
@@ -139,10 +84,13 @@ function renderPage() {
     }
 
     grid.innerHTML = visibleItems.map(cardHTML).join("");
-    grid.querySelectorAll(".wishlist-btn").forEach((btn) => {
-      btn.addEventListener("click", () =>
-        toggleWishlist(parseInt(btn.dataset.id))
-      );
+    // heart buttons are rendered with class .heart-btn
+    grid.querySelectorAll(".heart-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = parseInt(btn.dataset.id);
+        if (typeof window.toggleWishlist === 'function') window.toggleWishlist(id);
+        else console.warn('toggleWishlist missing');
+      });
     });
     grid.querySelectorAll(".cart-btn").forEach((btn) => {
       btn.addEventListener("click", () => toggleCart(parseInt(btn.dataset.id)));
@@ -172,6 +120,8 @@ function renderPage() {
           visibleCount,
           gap
         );
+        // keep visible-count map in sync
+        categoryVisibleCount[category] = visibleCount;
       });
 
       // Right button (▶) → go forwards
@@ -185,35 +135,55 @@ function renderPage() {
           visibleCount,
           gap
         );
+        // keep visible-count map in sync
+        categoryVisibleCount[category] = visibleCount;
       });
     }
     
   });  bindCardEvents();
 }
 function renderCartPage() {
-  const cart = getStorage("cart");
-  const filtered = products.filter((p) => cart.includes(p.id));
-  const total = filtered.reduce((sum, p) => sum + p.price, 0).toFixed(2);
+  const cart = getStorage("cart") || [];
+
+  // Normalize cart into list of { productId, quantity }
+  let cartItems = [];
+  if (cart.length && typeof cart[0] === 'object' && cart[0].productId !== undefined) {
+    cartItems = cart.map((it) => ({ productId: it.productId, quantity: it.quantity || 1 }));
+  } else {
+    cartItems = cart.map((id) => ({ productId: id, quantity: 1 }));
+  }
+
+  const ids = cartItems.map((it) => it.productId);
+
+  const filtered = products.filter((p) => ids.includes(p.id));
+
+  // compute total respecting quantities
+  const total = filtered.reduce((sum, p) => {
+    const ci = cartItems.find((it) => it.productId === p.id) || { quantity: 1 };
+    return sum + p.price * (ci.quantity || 1);
+  }, 0).toFixed(2);
 
   container.innerHTML = `
     <div class="category-section">
       <h2 class="category-title">MY CART</h2>
       <div class="category-grid">
-        ${filtered.map((p) => `
+        ${filtered.map((p) => {
+          const ci = cartItems.find((it) => it.productId === p.id) || { quantity: 1 };
+          return `
           <div class="product-card" data-id="${p.id}">
             <img src="${p.image}" class="product-image">
             <h3>${escapeHtml(p.title)}</h3>
-            <p>$${p.price}</p>
+            <p>$${p.price} ${ci.quantity && ci.quantity > 1 ? ` x ${ci.quantity}` : ''}</p>
             <div class="card-actions">
               <button class="icon-btn cart-btn active" data-id="${p.id}">
                 <i class="fa-solid fa-cart-shopping"></i>
               </button>
             </div>
           </div>
-        `).join("")}
+        `}).join("")}
       </div>
       <div id="cart-stats" style="text-align:center; margin:2em; font-size:1.2rem; font-weight:bold;">
-        Items: ${filtered.length} | Total: $${total}
+        Items: ${cartItems.reduce((s, it) => s + (it.quantity || 1), 0)} | Total: $${total}
       </div>
     </div>
   `;
@@ -224,7 +194,7 @@ function renderCartPage() {
 function renderWishlistPage() {
   const wishlist = getStorage("wishlist");
   const filtered = products.filter((p) => wishlist.includes(p.id));
-
+  console.log(filtered);
   container.innerHTML = filtered.map((p) => `
     <div class="product-card" data-id="${p.id}">
       <img src="${p.image}" class="product-image">
@@ -283,6 +253,7 @@ function renderCategoryOnly(category, subCategory = null) {
   const searchTerm = (searchInput?.value || "").trim().toLowerCase();
   let filtered = products.filter((p) => p.category === category);
   if (subCategory) {
+    console.log(subCategory);   
     filtered = filtered.filter((p) => p.subCategory === subCategory);
   }
   if (searchTerm)
@@ -295,144 +266,23 @@ function renderCategoryOnly(category, subCategory = null) {
 
   section.appendChild(grid);
   container.appendChild(section);
-  grid.querySelectorAll(".wishlist-btn").forEach((btn) => {
-    btn.addEventListener("click", () =>
-      toggleWishlist(parseInt(btn.dataset.id))
-    );
+  grid.querySelectorAll(".heart-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = parseInt(btn.dataset.id);
+      if (typeof window.toggleWishlist === 'function') window.toggleWishlist(id);
+      else console.warn('toggleWishlist missing');
+    });
   });
   grid.querySelectorAll(".cart-btn").forEach((btn) => {
-    btn.addEventListener("click", () => toggleCart(parseInt(btn.dataset.id)));
-  });indCardEvents()
+    btn.addEventListener("click", () => {
+      const id = parseInt(btn.dataset.id);
+      if (typeof window.toggleCart === 'function') window.toggleCart(id);
+      else console.warn('toggleCart missing');
+    });
+  });
   bindCardEvents();
 }
 /* ---------- Render a subset of categories, same as normal page ---------- */
-function renderSubset(categoriesToShow) {
-  mode = "all";
-  selectedCategory = null;
-  container.classList.remove("category-only");
-  container.innerHTML = "";
-
-  const searchTerm = (searchInput?.value || "").trim().toLowerCase();
-
-  const categories = {};
-  products.forEach((p) => {
-    if (searchTerm && !p.title.toLowerCase().includes(searchTerm)) return;
-    if (!categories[p.category]) categories[p.category] = [];
-    categories[p.category].push(p);
-  });
-
-  // Only keep categories we want
-  const filteredCategories = Object.fromEntries(
-    Object.entries(categories).filter(([cat]) => categoriesToShow.includes(cat))
-  );
-
-  Object.entries(filteredCategories).forEach(([category, items]) => {
-    if (!(category in categoryIndices)) categoryIndices[category] = 0;
-    categoryIndices[category] = categoryIndices[category] % items.length;
-
-    const section = document.createElement("div");
-    section.className = "category-section";
-
-    const title = document.createElement("h2");
-    title.className = "category-title";
-    title.textContent = category.toUpperCase();
-
-    // Make category titles clickable, like nav buttons
-    title.style.cursor = "pointer";
-    title.addEventListener("click", () => {
-      if (category === "clothing" || category === "clothes") {
-        renderSubset(["men's clothing", "women's clothing"]);
-      } else if (
-        category === "men's clothing" ||
-        category === "women's clothing"
-      ) {
-        renderCategoryOnly(category);
-      } else {
-        renderCategoryOnly(category);
-      }
-    });
-
-    section.appendChild(title);
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "carousel-wrapper";
-
-    const grid = document.createElement("div");
-    grid.className = "category-grid";
-
-    wrapper.appendChild(grid);
-    section.appendChild(wrapper);
-    container.appendChild(section);
-
-    const availableWidth = Math.floor(wrapper.clientWidth);
-    const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
-
-    grid.style.gap = `${gap}px`;
-    grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
-
-    const start = categoryIndices[category];
-    const showCount = Math.min(visibleCount, items.length);
-    let visibleItems = [];
-    for (let i = 0; i < showCount; i++) {
-      visibleItems.push(items[(start + i) % items.length]);
-    }
-
-    grid.innerHTML = visibleItems.map(cardHTML).join("");
-    
-    if (items.length > visibleCount) {
-      const leftBtn = document.createElement("button");
-      leftBtn.className = "carousel-btn left-btn";
-      leftBtn.textContent = "◀";
-
-      const rightBtn = document.createElement("button");
-      rightBtn.className = "carousel-btn right-btn";
-      rightBtn.textContent = "▶";
-
-      section.appendChild(leftBtn);
-      section.appendChild(rightBtn);
-
-      leftBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] - 1 + items.length) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-      });
-
-      rightBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] + 1) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-      });
-    }
-    bindCardEvents();
-  });
-}
-function bindCardEvents() {
-  document.querySelectorAll(".heart-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = parseInt(btn.dataset.id);
-      toggleWishlist(id);
-    });
-  });
-
-  document.querySelectorAll(".cart-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = parseInt(btn.dataset.id);
-      toggleCart(id);
-    });
-  });
-}
 
 /* ---------- helpers & events ---------- */
 
@@ -454,9 +304,10 @@ document.querySelectorAll(".category-btn").forEach((btn) => {
 // subcategory buttons
 document.querySelectorAll(".subcategory-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const cat = btn.dataset.category;
+    const cat = btn.dataset.category||"clothing";
     const sub = btn.dataset.subcategory;
-    renderCategoryOnly(cat, sub);
+    console.log(cat, sub);
+    renderSubset([sub]);
   });
 });
 
@@ -469,7 +320,7 @@ if (logo) {
 
 // search input
 if (searchInput) {
-  searchInput.addEventListener("input", () => {
+    searchInput.addEventListener("input", () => {
     if (mode === "all") renderPage();
     else if (mode === "category" && selectedCategory)
       renderCategoryOnly(selectedCategory, selectedSubCategory);
@@ -484,43 +335,4 @@ window.addEventListener("resize", () => {
 });
 
 fetchProducts();
-/* ========== Wishlist & Cart Logic ========== */
-function getStorage(key) {
-  return JSON.parse(localStorage.getItem(key)) || [];
-}
-
-function setStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-function toggleWishlist(productId) {
-  let wishlist = getStorage("wishlist");
-  if (wishlist.includes(productId)) {
-    wishlist = wishlist.filter((id) => id !== productId);
-  } else {
-    wishlist.push(productId);
-  }
-  setStorage("wishlist", wishlist);
-  renderPage();
-}
-
-function toggleCart(productId) {
-  let cart = getStorage("cart");
-  if (cart.includes(productId)) {
-    cart = cart.filter((id) => id !== productId);
-  } else {
-    cart.push(productId);
-  }
-  setStorage("cart", cart);
-  renderPage();
-}
-// Navbar redirections
-document.getElementById("nav-cart").addEventListener("click", () => {
-  window.location.href = "mycart.html";
-});
-
-document.getElementById("nav-heart").addEventListener("click", () => {
-  window.location.href = "mywishlist.html";
-});
-
-// Example: saving product data to localStorage
+/* These functions are now in cart-wishlist.js and navigation.js */

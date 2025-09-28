@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>My Wishlist</title>
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/button-styles.css">
     <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
 </head>
 <body>
      <header>
   <div class="nav-container">
-    <div class="logo">MiniMart</div>
+    <div class="logo" id="logo">MiniMart</div>
 
     <div class="nav-main">
       <div class="categories">
@@ -40,13 +41,9 @@
 
   <main id="products-container"></main>
 
-  <script src="./js/script.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchProducts().then(() => {
-        renderWishlistPage();
-      });
-    });
-  </script>
+  <script src="./js/common.js"></script>
+  <script src="./js/cart-wishlist.js"></script>
+  <script src="./js/rendering.js"></script>
+  <script src="./js/wishlist.js"></script>
 </body>
 </html>
