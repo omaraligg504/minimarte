@@ -59,7 +59,14 @@ function renderCategorySection(category, products, container, options = {}) {
   grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
   
   // Handle carousel if needed
-  if (options.carousel && products.length > visibleCount) {
+  // If COLLAPSE_TO_VISIBLE is enabled, we trim the list to visibleCount and
+  // do not add carousel controls — this makes the page remove extra items
+  // as the screen narrows (1-per-row behavior on small screens).
+  if (window.COLLAPSE_TO_VISIBLE) {
+    const displayItems = products.slice(0, visibleCount);
+    grid.innerHTML = displayItems.map(cardHTML).join("");
+    bindCardEvents();
+  } else if (options.carousel && products.length > visibleCount) {
     let currentIndex = 0;
     
     const updateGrid = () => {

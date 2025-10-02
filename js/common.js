@@ -25,17 +25,40 @@ function escapeHtml(text) {
 }
 
 function getVisibleCountForWidth(availableWidth) {
-  for (let k = MAX_VISIBLE; k >= 1; k--) {
-    if (k === 1) {
-      if (CARD_MIN_WIDTH <= availableWidth) return { visibleCount: 1, gap: 0 };
-      continue;
-    }
-    const gap = (availableWidth - k * CARD_MIN_WIDTH) / (k - 1);
-    if (gap >= MIN_GAP) {
-      return { visibleCount: k, gap: Math.min(gap, MAX_GAP) };
-    }
+  const GAP = 24; // Fixed gap size
+  
+  // Calculate widths for different numbers of items
+  const width4 = (CARD_MIN_WIDTH * 4) + (GAP * 3); // 4 items + 3 gaps
+  const width3 = (CARD_MIN_WIDTH * 3) + (GAP * 2); // 3 items + 2 gaps
+  const width2 = (CARD_MIN_WIDTH * 2) + GAP;       // 2 items + 1 gap
+  const width1 = CARD_MIN_WIDTH;                    // 1 item, no gaps
+  
+  // Return exact fits based on available width
+  if (availableWidth >= width4) {
+    return {
+      visibleCount: 4,
+      gap: GAP,
+      exactWidth: width4
+    };
+  } else if (availableWidth >= width3) {
+    return {
+      visibleCount: 3,
+      gap: GAP,
+      exactWidth: width3
+    };
+  } else if (availableWidth >= width2) {
+    return {
+      visibleCount: 2,
+      gap: GAP,
+      exactWidth: width2
+    };
+  } else {
+    return {
+      visibleCount: 1,
+      gap: 0,
+      exactWidth: width1
+    };
   }
-  return { visibleCount: 1, gap: 0 };
 }
 
 // Create HTML string for a product card

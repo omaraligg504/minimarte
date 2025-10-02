@@ -1,32 +1,32 @@
-/* Cart and Wishlist button styles: clearer normal vs active states */
-/* Default (normal) state: muted, low contrast so active stands out */
+
+
 .heart-btn,
 .cart-btn {
-  background-color: #f0f0f0; /* light neutral background */
-  color: #555555;            /* muted icon color */
+  background-color: #f0f0f0; 
+  color: #555555;            
   transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
 
-/* Hover for affordance */
+
 .heart-btn:hover { background-color: #ffecec; color: #d64550; }
 .cart-btn:hover  { background-color: #ecfff0; color: #2e8b57; }
 
-/* Active (picked) states: vivid colored background + white icon for strong contrast */
+
 .heart-btn.active {
-  background-color: #e74c3c; /* vivid red */
+  background-color: #e74c3c; 
   color: #ffffff;
   transform: scale(1.08);
 }
 .heart-btn.active i { color: #ffffff; }
 
 .cart-btn.active {
-  background-color: #27ae60; /* vivid green */
+  background-color: #27ae60; 
   color: #ffffff;
   transform: scale(1.08);
 }
 .cart-btn.active i { color: #ffffff; }
 
-/* Small pop animation for button icons when activated */
+
 @keyframes pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.18); }
@@ -34,21 +34,21 @@
 }
 .heart-btn.active i, .cart-btn.active i { animation: pop 280ms ease-out; }
 
-/* Navigation icon styles: muted by default, colored when has-items */
+
 #nav-heart, #nav-cart { color: #d0d0d0; transition: color 160ms ease; }
 #nav-heart.has-items { color: #e74c3c; }
 #nav-cart.has-items  { color: #27ae60; }
 
-/* Ensure product card action buttons have a consistent transition */
+
 .product-card .card-actions button {
   transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
 .product-card .card-actions button:hover { transform: scale(1.06); }
 
-/* Accessibility: add a subtle outline on keyboard focus */
+
 .heart-btn:focus, .cart-btn:focus, .icon-btn:focus { outline: 2px solid rgba(0,0,0,0.08); outline-offset: 2px; }
 
-/* Checkout / CTA button consistent with site */
+
 .checkout-button {
   display: inline-block;
   padding: 0.7rem 1.25rem;
@@ -64,11 +64,11 @@
 .checkout-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(39,170,96,0.16); }
 .checkout-button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* Form field error visuals */
+
 .input-error { border-color: #e74c3c !important; box-shadow: 0 0 0 3px rgba(231,76,60,0.08); }
 .field-error { color: #e74c3c; font-size: 0.9rem; margin-top: 0.35rem; }
 
-/* Quantity controls in cart */
+
 .quantity-controls { display:flex; align-items:center; gap:0.5rem; }
 .qty-btn {
   width:32px; height:32px; border-radius:6px; border:none; background:#f0f0f0; cursor:pointer; font-weight:700;

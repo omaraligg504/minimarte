@@ -62,14 +62,19 @@ function renderPage() {
     section.appendChild(wrapper);
     container.appendChild(section);
 
-    const availableWidth = Math.floor(wrapper.clientWidth);
-    const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
+    // Calculate responsive sizing - use container width as it's the available space
+    const availableWidth = container.clientWidth || window.innerWidth;
+    const { visibleCount, gap, exactWidth } = getVisibleCountForWidth(availableWidth);
+    console.log(`[${category}] availableWidth: ${availableWidth}px, visibleCount: ${visibleCount}, exactWidth: ${exactWidth}px`);
+    wrapper.style.setProperty('--gap', `${gap}px`);
+    wrapper.style.setProperty('--exact-width', `${exactWidth}px`);
 
-    // Rotate start index forward when visibleCount decreased so items shift
+    // Preserve the leftmost visible item when visibleCount changes
     const prevVisible = categoryVisibleCount[category] ?? visibleCount;
-    if (visibleCount < prevVisible) {
-      const delta = prevVisible - visibleCount;
-      categoryIndices[category] = (categoryIndices[category] + delta) % items.length;
+    if (prevVisible !== visibleCount) {
+      // Keep the current start index, but ensure it's within valid bounds
+      const maxStart = Math.max(0, items.length - visibleCount);
+      categoryIndices[category] = Math.min(categoryIndices[category], maxStart);
     }
     categoryVisibleCount[category] = visibleCount;
 
@@ -82,9 +87,11 @@ function renderPage() {
     for (let i = 0; i < showCount; i++) {
       visibleItems.push(items[(start + i) % items.length]);
     }
-
+    
+    // Render the visible items
     grid.innerHTML = visibleItems.map(cardHTML).join("");
-    // heart buttons are rendered with class .heart-btn
+    
+    // Bind event listeners to heart and cart buttons
     grid.querySelectorAll(".heart-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = parseInt(btn.dataset.id);
@@ -96,51 +103,54 @@ function renderPage() {
       btn.addEventListener("click", () => toggleCart(parseInt(btn.dataset.id)));
     });
 
+    // Add navigation buttons if there are more items than visible
     if (items.length > visibleCount) {
-      const leftBtn = document.createElement("button");
-      leftBtn.className = "carousel-btn left-btn";
-      leftBtn.textContent = "◀";
+        const leftBtn = document.createElement("button");
+        leftBtn.className = "carousel-btn left-btn";
+        leftBtn.textContent = "◀";
 
-      const rightBtn = document.createElement("button");
-      rightBtn.className = "carousel-btn right-btn";
-      rightBtn.textContent = "▶";
+        const rightBtn = document.createElement("button");
+        rightBtn.className = "carousel-btn right-btn";
+        rightBtn.textContent = "▶";
 
-      section.appendChild(leftBtn);
-      section.appendChild(rightBtn);
+        section.appendChild(leftBtn);
+        section.appendChild(rightBtn);
 
-      // Left button should show the previous visible set (move right visually)
-      // Left button (◀) → go backwards
-      rightBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] - 1 + items.length) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-        // keep visible-count map in sync
-        categoryVisibleCount[category] = visibleCount;
-      });
+        // Left button should show the previous visible set (move right visually)
+        // Left button (◀) → go backwards
+        rightBtn.addEventListener("click", () => {
+          categoryIndices[category] =
+            (categoryIndices[category] - 1 + items.length) % items.length;
+          updateSectionGrid(
+            grid,
+            items,
+            categoryIndices[category],
+            visibleCount,
+            gap
+          );
+          // keep visible-count map in sync
+          categoryVisibleCount[category] = visibleCount;
+        });
 
-      // Right button (▶) → go forwards
-      leftBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] + 1) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-        // keep visible-count map in sync
-        categoryVisibleCount[category] = visibleCount;
-      });
-    }
+        // Right button (▶) → go forwards
+        leftBtn.addEventListener("click", () => {
+          categoryIndices[category] =
+            (categoryIndices[category] + 1) % items.length;
+          updateSectionGrid(
+            grid,
+            items,
+            categoryIndices[category],
+            visibleCount,
+            gap
+          );
+          // keep visible-count map in sync
+          categoryVisibleCount[category] = visibleCount;
+        });
+      }
     
-  });  bindCardEvents();
+  });
+  
+  bindCardEvents();
 }
 function renderCartPage() {
   const cart = getStorage("cart") || [];

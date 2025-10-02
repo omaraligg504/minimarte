@@ -65,13 +65,16 @@ function renderPage() {
     section.appendChild(wrapper);
     container.appendChild(section);
 
-    const availableWidth = Math.floor(wrapper.clientWidth);
-    const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
+    const availableWidth = container.clientWidth || window.innerWidth;
+    const { visibleCount, gap, exactWidth } = getVisibleCountForWidth(availableWidth);
+    console.log(`[${category}] availableWidth: ${availableWidth}px, visibleCount: ${visibleCount}, exactWidth: ${exactWidth}px`);
+    wrapper.style.setProperty('--gap', `${gap}px`);
+    wrapper.style.setProperty('--exact-width', `${exactWidth}px`);
+    // Preserve current start index when visibleCount changes: clamp it so
+    // the same first-visible item remains visible where possible.
     const prevVisible = categoryVisibleCount[category] ?? visibleCount;
-    if (visibleCount < prevVisible) {
-      const delta = prevVisible - visibleCount;
-      categoryIndices[category] = (categoryIndices[category] + delta) % items.length;
-    }
+    const maxStart = Math.max(0, items.length - visibleCount);
+    categoryIndices[category] = Math.min(categoryIndices[category], maxStart);
     categoryVisibleCount[category] = visibleCount;
 
     grid.style.gap = `${gap}px`;
@@ -84,47 +87,50 @@ function renderPage() {
       visibleItems.push(items[(start + i) % items.length]);
     }
 
+    // Render the visible items
     grid.innerHTML = visibleItems.map(cardHTML).join("");
 
+    // Add navigation buttons if there are more items than visible
     if (items.length > visibleCount) {
-      const leftBtn = document.createElement("button");
-      leftBtn.className = "carousel-btn left-btn";
-      leftBtn.textContent = "◀";
+        const leftBtn = document.createElement("button");
+        leftBtn.className = "carousel-btn left-btn";
+        leftBtn.textContent = "◀";
 
-      const rightBtn = document.createElement("button");
-      rightBtn.className = "carousel-btn right-btn";
-      rightBtn.textContent = "▶";
+        const rightBtn = document.createElement("button");
+        rightBtn.className = "carousel-btn right-btn";
+        rightBtn.textContent = "▶";
 
-      section.appendChild(leftBtn);
-      section.appendChild(rightBtn);
+        section.appendChild(leftBtn);
+        section.appendChild(rightBtn);
 
-      rightBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] - 1 + items.length) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-        categoryVisibleCount[category] = visibleCount;
-      });
+        rightBtn.addEventListener("click", () => {
+          categoryIndices[category] =
+            (categoryIndices[category] - 1 + items.length) % items.length;
+          updateSectionGrid(
+            grid,
+            items,
+            categoryIndices[category],
+            visibleCount,
+            gap
+          );
+          categoryVisibleCount[category] = visibleCount;
+        });
 
-      leftBtn.addEventListener("click", () => {
-        categoryIndices[category] =
-          (categoryIndices[category] + 1) % items.length;
-        updateSectionGrid(
-          grid,
-          items,
-          categoryIndices[category],
-          visibleCount,
-          gap
-        );
-        categoryVisibleCount[category] = visibleCount;
-      });
-    }
+        leftBtn.addEventListener("click", () => {
+          categoryIndices[category] =
+            (categoryIndices[category] + 1) % items.length;
+          updateSectionGrid(
+            grid,
+            items,
+            categoryIndices[category],
+            visibleCount,
+            gap
+          );
+          categoryVisibleCount[category] = visibleCount;
+        });
+      }
   });
+  
   bindCardEvents();
 }
 
@@ -225,13 +231,17 @@ function renderSubset(categoriesToShow) {
     section.appendChild(wrapper);
     container.appendChild(section);
 
-    const availableWidth = Math.floor(wrapper.clientWidth);
-    const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
+  const availableWidth = Math.floor(wrapper.clientWidth);
+  const { visibleCount, gap } = getVisibleCountForWidth(availableWidth);
 
-    grid.style.gap = `${gap}px`;
-    grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
+  // Preserve start index on resize by clamping it to available range
+  const maxStart2 = Math.max(0, items.length - visibleCount);
+  categoryIndices[category] = Math.min(categoryIndices[category], maxStart2);
 
-    const start = categoryIndices[category];
+  grid.style.gap = `${gap}px`;
+  grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
+
+  const start = categoryIndices[category];
     const showCount = Math.min(visibleCount, items.length);
     let visibleItems = [];
     for (let i = 0; i < showCount; i++) {
@@ -281,6 +291,25 @@ function renderSubset(categoriesToShow) {
 }
 
 // Event listeners
+
+// Add resize handler to update layout when window size changes
+let resizeTimeout;
+let lastWidth = window.innerWidth;
+
+window.addEventListener('resize', () => {
+  const currentWidth = window.innerWidth;
+  
+  // Debounce but also check if width crossed a breakpoint threshold
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (mode === 'all') {
+      renderPage();
+    } else if (mode === 'category' && selectedCategory) {
+      renderCategoryOnly(selectedCategory, selectedSubCategory);
+    }
+    lastWidth = currentWidth;
+  }, 50); // Reduced to 50ms for faster response
+});
 
 // Initialize
 fetchProducts().then(() => renderPage());

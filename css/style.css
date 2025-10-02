@@ -1,18 +1,28 @@
-/* ===== deduped CSS (keeps the exact final computed styles) ===== */
 
-/* Global reset */
+
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  text-decoration: none;
+  list-style: none;
+}
+.search-wrapper {
+  flex: 1;
+  min-width: 100px;
+}
+.nav-main {
+  flex-wrap: nowrap;
+  gap: 1rem;
 }
 
 body {
-  overflow-x: hidden; /* ensure no horizontal scrollbar from carousels */
+  overflow-x: hidden; 
 }
 
-/* Header */
+
 header {
   background-color: #2D2D2D;
   padding: 1vh 2vw;
@@ -25,19 +35,19 @@ header {
 
 .nav-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
+  max-width: 1200px;
 }
 
 .nav-main {
   display: flex;
   align-items: center;
-  gap: 4vw;                  /* spacing between items */
-  width: 100%;
-  max-width: 1200px;
+  gap: 2vw;
+  flex: 1;
 }
 
-/* Logo */
+
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
@@ -47,51 +57,175 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.nav-icons{
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  padding-right:10px ;
+  white-space: nowrap;
 }
 
-/* Category buttons (merged properties; later values override earlier ones) */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-right: 10px;
+}
+
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+
+.categories-menu {
+  display: flex;
+  align-items: center;
+}
+
+.categories-list {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.categories-list li {
+  position: relative;
+}
+
+
 .category-btn {
   padding: 0.5em 1em;
   border: none;
-  background-color: #2D2D2D;
+  background-color: transparent;
   cursor: pointer;
   color: #ffffff;
   font-size: 1rem;
-  border-radius: 0.25em;
-  flex-shrink: 1;        /* allow shrinking */
-  min-width: 6ch;        /* prevent too tiny buttons */
+  white-space: nowrap;
 }
 
 .category-btn:hover {
   background-color: rgb(82, 80, 80);
 }
 
-/* Shrink buttons immediately when space is tight */
-@media (max-width: 600px) {
+
+.submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #2D2D2D;
+  border-radius: 4px;
+  padding: 0.5rem 0;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.has-submenu:hover .submenu {
+  display: block;
+}
+
+.submenu li {
+  padding: 0.25rem 1rem;
+}
+
+.subcategory-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.5em 1em;
+  border: none;
+  background: none;
+  color: white;
+  cursor: pointer;
+}
+
+.subcategory-btn:hover {
+  background-color: rgb(82, 80, 80);
+}
+
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-right: 1rem;
+  }
+
+  .nav-main {
+    position: relative;
+    flex-wrap: nowrap;
+    gap: 1rem;
+  }
+
+  .categories-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background-color: #2D2D2D;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+
+  .categories-menu.active {
+    display: block;
+  }
+
+  .categories-list {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
+    margin-right: 0;
+  }
+
   .category-btn {
-    padding: 0.3em 0.6em;
-    font-size: 0.85rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.7em 1em;
+  }
+
+  .submenu {
+    position: static;
+    display: none;
+    width: 100%;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .has-submenu.active .submenu {
+    display: block;
+  }
+
+  .subcategory-btn {
+    padding: 0.5em 1em;
+    width: 100%;
+    text-align: left;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    min-width: 100px;
   }
 }
 
-@media (max-width: 480px) {
-  .category-btn {
-    padding: 0.25em 0.5em;
-    font-size: 0.8rem;
-  }
-}
 
-/* Search wrapper */
+
 .search-wrapper {
   position: relative;
-  flex: 1 1 50%;
-  min-width: 20%;
+  flex: 1 1 200px;
+  min-width: 150px;
+  max-width: 400px;
+  margin-left: 1rem;
 }
 
 .search-wrapper input {
@@ -112,7 +246,7 @@ header {
   color: #555;
 }
 
-/* Favorites & Cart icons */
+
 .nav-icons i {
   font-size: 1.5rem;
   cursor: pointer;
@@ -121,7 +255,7 @@ header {
   padding: 0.5vh 0.5vw;
 }
 
-/* Dropdown / categories nav */
+
 .categories {
   display: flex;
   gap: 1vw;
@@ -161,21 +295,21 @@ header {
   display: flex;
 }
 
-/* Container for all categories */
+
 #products-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2vw;
 }
-/* category-only page wrapper (keeps page centered) */
+
 #products-container.category-only {
   width: 100%;
   padding: 1.5vw;
   box-sizing: border-box;
 }
 
-/* ensure each category section is centered inside the page */
+
 #products-container.category-only .category-section {
   max-width: 1200px;
   margin: 0 auto 3.5vw;
@@ -184,47 +318,50 @@ header {
   align-items: center;
 }
 
-/* center the title */
+
 #products-container.category-only .category-title {
   text-align: center;
   width: 100%;
   margin-bottom: 1rem;
 }
 
-/* FLEX grid: wrap into rows and center the last row */
+
 #products-container.category-only .category-grid {
   display: flex;
-  flex-wrap: wrap;          /* allow wrapping into multiple rows */
-  justify-content: center;  /* center items and also center last row */
+  flex-wrap: wrap;          
+  justify-content: center;  
   gap: 1.5vw;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* product card sizing for wrapping behavior */
+
 #products-container.category-only .product-card {
-  flex: 0 0 280px;  /* don't grow or shrink, base width 280px */
+  
+  flex: 0 0 280px;
+  width: 280px;
+  min-width: 280px;
   max-width: 280px;
   box-sizing: border-box;
   margin: 0;
 }
 
-/* optional: slightly smaller cards on small screens to allow one more per row on narrow desktops */
+
 @media (min-width: 1400px) {
   #products-container.category-only .product-card { flex-basis: 250px; max-width: 250px; }
 }
 @media (max-width: 420px) {
-  #products-container.category-only .product-card { flex-basis: 100%; max-width: 460px; } /* single centered card */
+  #products-container.category-only .product-card { flex-basis: 100%; max-width: 460px; } 
 }
 
-/* Category grid view (alternate) */
+
 #products-container.grid-view {
   display: grid;
   justify-content: center;
   gap: 1.5vw;
 }
 
-/* Category section */
+
 .category-section {
   display: flex;
   flex-direction: column;
@@ -246,24 +383,25 @@ header {
   text-align: center;
 }
 
-/* Carousel wrapper and grid (final values preserved) */
+
 .carousel-wrapper {
-  width: 100%;
+  width: var(--exact-width);
   overflow: hidden;
   display: flex;
   justify-content: center;
   position: relative;
+  margin: 0 auto;
 }
 
 .category-grid {
   display: flex;
-  gap: 1.5vw;
-  justify-content: center;
+  gap: var(--gap, 24px);
+  justify-content: flex-start;
   align-items: stretch;
-  transition: gap 150ms ease;
+  transition: all 150ms ease;
 }
 
-/* Carousel arrow buttons (final values) */
+
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -279,10 +417,24 @@ header {
   z-index: 20;
 }
 
+
 .left-btn { left: -0.75em; }
 .right-btn { right: -0.75em; }
 
-/* Product Card (merged; later values override earlier ones) */
+
+@media (max-width: 768px) {
+  .left-btn { left: 0.5em; }
+  .right-btn { right: 0.5em; }
+  .carousel-btn { width: 2.2em; height: 2.2em; font-size: 1rem; }
+}
+
+@media (max-width: 420px) {
+  .left-btn { left: 0.35em; }
+  .right-btn { right: 0.35em; }
+  .carousel-btn { width: 2em; height: 2em; font-size: 0.95rem; }
+}
+
+
 .product-card {
   background-color: #ffffff;
   color: #2D2D2D;
@@ -292,19 +444,31 @@ header {
   flex-direction: column;
   align-items: center;
   position: relative;
-  width: 280px;       /* from earlier block */
-  min-width: 280px;   /* from later block */
-  flex-shrink: 0;
+  
+  flex: 0 0 280px; 
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
   padding: 0.6em;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   transition: transform 0.5s ease;
+}
+
+
+@media (max-width: 320px) {
+  .product-card {
+    flex: 0 0 90vw;
+    width: 90vw;
+    min-width: 90vw;
+    max-width: 90vw;
+  }
 }
 
 .product-card:hover {
   transform: translateY(-0.5vh);
 }
 
-/* Product image rules kept separately to preserve original specificity interactions */
+
 .product-card img {
   width: 100%;
   height: 200px;
@@ -319,7 +483,7 @@ header {
   background: #f7f7f7;
 }
 
-/* Text */
+
 .product-title,
 .product-price,
 .product-description {
@@ -332,14 +496,14 @@ header {
   font-weight: bold;
 }
 
-/* Wishlist (heart) & Cart buttons */
+
 .heart-btn,
 .cart-btn {
   width: 2em;
   height: 2em;
   border-radius: 50%;
   border: none;
-  /* neutral defaults; visual states are defined in button-styles.css */
+  
   background-color: #f0f0f0;
   color: #555555;
   cursor: pointer;
@@ -347,11 +511,11 @@ header {
   transition: all 0.18s ease;
 }
 
-/* Positioning preserved */
+
 .heart-btn { right: 0.5em; }
 .cart-btn { left: 0.5em; }
 
-/* Add to Cart button at bottom */
+
 .add-to-cart-btn {
   width: calc(100% - 2em);
   margin: 0.5em 1em 1em;
@@ -371,15 +535,15 @@ header {
 }
 .items-wrapper {
   display: flex;
-  justify-content: center; /* keep items centered */
-  flex-wrap: wrap;         /* allow multiple rows */
-  gap: 20px;               /* spacing between items */
+  justify-content: center; 
+  flex-wrap: wrap;         
+  gap: 20px;               
 }
 .category-title-bar {
   font-size: 1.8rem;
   font-weight: bold;
   margin: 20px 0;
-  text-align: center; /* center the bar text */
+  text-align: center; 
 }
 
 .card-actions i:hover {
@@ -387,7 +551,6 @@ header {
 }
 .product-card {
   position: relative;
-  width: 250px;
   text-align: center;
   padding: 15px;
   border-radius: 15px;
@@ -398,13 +561,18 @@ header {
   justify-content: space-between;
 }
 
+
+@media (max-width: 420px) {
+  .product-card { flex: 0 0 92%; min-width: 92%; max-width: 92%; }
+}
+
 .product-card img {
   max-width: 100%;
   border-radius: 10px;
 }
 .card-actions {
   width: 100%;
-  /* background-color: #27ae60; */
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -436,3 +604,4 @@ header {
 .icon-btn i {
   pointer-events: none;
 }
+
