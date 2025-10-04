@@ -10,6 +10,88 @@ let selectedCategory = null;
 let selectedSubCategory = null;
 // Track last visible count per category so we can rotate items when narrowing
 const categoryVisibleCount = {};
+// Mobile menu functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const categoriesMenu = document.querySelector('.categories-menu');
+    const submenuParents = document.querySelectorAll('.has-submenu');
+
+    // Toggle mobile menu
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent the click from bubbling up
+        categoriesMenu.classList.toggle('active');
+    });
+
+    // Handle submenu toggles on mobile
+    submenuParents.forEach(parent => {
+        const categoryBtn = parent.querySelector('.category-btn');
+        categoryBtn.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Close other open submenus
+                submenuParents.forEach(p => {
+                    if (p !== parent) p.classList.remove('active');
+                });
+                parent.classList.toggle('active');
+            }
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.categories-menu') && !e.target.closest('.mobile-menu-btn')) {
+            categoriesMenu.classList.remove('active');
+            submenuParents.forEach(parent => parent.classList.remove('active'));
+        }
+    });
+
+    // Prevent clicks inside menu from closing it
+    categoriesMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
+// function render(){
+//   mode = "all";
+//   selectedCategory=null;
+//   selectedSubCategory=null;
+//   container.removerClass("category-only");
+//   container.innerHTML="";
+//   const searchTerm=(searchInput?.value || "").trim().toLowerCase();
+//   const categpries={}
+//   products.forEach((p)=>{
+//     if(searchTerm && !p.title.toLowerCase().includes(searchTerm)) return;
+//     if(categories[p.category]) categories[p.category]=[];
+//     categories[p.category].push(p);
+//   }
+//   Object.entries(categories).forEach(([category,items])=>{
+//     if(!categoryIndices[category])categoryIndices[category]=0;
+//     cateforyIndices[category]=categoryIndices[category]%items.length;
+//     const section=document.createElement("div");
+//     section.className="category-section";
+//     const title=document.createEelement("h2");
+//     title.className="category-title";
+//     title.textContent=category.toUpperCase();
+//     title.style.cursor="pointer";
+//     title.addEventListener("click",()=>{
+//       if(category==="clothing" || category==="clothes"){
+//         renderSubset(["men's clothing", "womenclothing"]);
+//       }else{
+//         renderCategoryOnly(category);
+//       }
+//   })
+//   const grid=document.createElement("div");
+//   const wrapper=document.createElement("div");
+//   section.appendChild(title);
+//   wrapper.className="carousel-wrapper";
+//   grid.className="category-grid";
+//   wrapper.appendChild(grid);
+//   section.appendChild(wrapper);
+//   container.appendChild(section);
+//   const availableWidth=container.clientWidth || window.innerWidth;
+// }
+
+
 
 // Render the main page with category carousels
 function renderPage() {
@@ -136,6 +218,10 @@ function renderPage() {
 
 // Render category-only view
 function renderCategoryOnly(category, subCategory = null) {
+  if (!products.length) {
+    fetchProducts().then(() => showCategoryProducts(category));
+    return;
+  }
   mode = "category";
   selectedCategory = category;
   selectedSubCategory = subCategory;
@@ -157,32 +243,43 @@ function renderCategoryOnly(category, subCategory = null) {
   grid.className = "category-grid";
 
   const searchTerm = (searchInput?.value || "").trim().toLowerCase();
+  console.log(products);
   let filtered = products.filter((p) => p.category === category);
   if (subCategory) {
+    // FIX: filter by subCategory property, not category
     filtered = filtered.filter((p) => p.subCategory === subCategory);
   }
-  if (searchTerm)
+  if (searchTerm) {
     filtered = filtered.filter((p) =>
       p.title.toLowerCase().includes(searchTerm)
     );
+  }
 
   grid.innerHTML = filtered.map(cardHTML).join("");
   grid.style.justifyContent = "center";
 
   section.appendChild(grid);
   container.appendChild(section);
+  console.log(`[${category}] Rendering ${filtered.length} items`);
   bindCardEvents();
 }
 
 // Render a subset of categories
 function renderSubset(categoriesToShow) {
+  if (!products.length) {
+    fetchProducts().then(() => showCategoryProducts(category));
+    return;
+  }
   mode = "all";
   selectedCategory = null;
   container.classList.remove("category-only");
   container.innerHTML = "";
 
   const searchTerm = (searchInput?.value || "").trim().toLowerCase();
-
+let filtered = products.filter((p) => p.category === category);
+if (subCategory) {
+  filtered = filtered.filter((p) => p.category === subCategory);
+}
   const categories = {};
   products.forEach((p) => {
     if (searchTerm && !p.title.toLowerCase().includes(searchTerm)) return;

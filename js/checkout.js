@@ -139,5 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <p>Thank you, ${escapeHtml(order.fullName)}. Your order has been received.</p>
       </div>
     `;
+    main.style.display = 'flex';
+    main.style.justifyContent = 'center';
+    main.style.alignItems = 'center';
+    main.style.minHeight = '80vh';
   });
 });

@@ -106,23 +106,15 @@ function setStorage(key, data) {
 function bindCardEvents() {
   document.querySelectorAll(".heart-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const id = parseInt(btn.dataset.id);
-      if (typeof window.toggleWishlist === 'function') {
-        window.toggleWishlist(id);
-      } else {
-        console.warn('toggleWishlist is not defined. Make sure cart-wishlist.js is loaded before page scripts.');
-      }
+      const id = parseInt(btn.dataset.id);    
+        window.toggleWishlist(id);     
     });
   });
 
   document.querySelectorAll(".cart-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const id = parseInt(btn.dataset.id);
-      if (typeof window.toggleCart === 'function') {
         window.toggleCart(id);
-      } else {
-        console.warn('toggleCart is not defined. Make sure cart-wishlist.js is loaded before page scripts.');
-      }
     });
   });
 }
@@ -131,8 +123,8 @@ function bindCardEvents() {
 async function fetchProducts() {
   const res = await fetch("https://fakestoreapi.com/products");
   products = await res.json();
-  // expose on window for modules that expect window.products
-  try { window.products = products; } catch (e) { /* ignore */ }
+
+  window.products = products; 
   return products;
 }
 
@@ -150,6 +142,7 @@ function updateSectionGrid(grid, items, startIndex, visibleCount, gap) {
     grid.style.justifyContent = visibleCount === 1 ? "center" : "flex-start";
     grid.innerHTML = visibleItems.map(cardHTML).join("");
     grid.style.opacity = "1";
+    bindCardEvents(); 
   }, 80);
 }
 // Navigation state
@@ -186,6 +179,7 @@ function showClothingCategories() {
 
 function showCategoryProducts(category) {
   if (window.location.pathname.endsWith("index.html")) {
+    console.log('Navigating to category:', category);
     renderCategoryOnly(category);
   } else {
     window.location.href = `index.html?category=${category}`;
@@ -248,6 +242,11 @@ function handleSearch() {
       showCategoryProducts(currentCategory);
     } else {
       renderPage();
+    }
+  } else {
+    // If on a category page, re-render the current category with the search term
+    if (typeof renderCategoryOnly === "function" && currentCategory) {
+      renderCategoryOnly(currentCategory, currentSubCategory);
     }
   }
 }
