@@ -1,5 +1,3 @@
-
-
 .heart-btn,
 .cart-btn {
   background-color: #f0f0f0; 
@@ -29,7 +27,7 @@
 
 @keyframes pop {
   0% { transform: scale(1); }
-  50% { transform: scale(1.18); }
+  50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
 .heart-btn.active i, .cart-btn.active i { animation: pop 280ms ease-out; }

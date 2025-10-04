@@ -9,7 +9,9 @@ function renderWishlistPage() {
     <div class="category-section">
       <h2 class="category-title">MY WISHLIST</h2>
       <div class="category-grid">
-        ${filtered.map((p) => `
+        ${filtered
+          .map(
+            (p) => `
           <div class="product-card" data-id="${p.id}">
             <img src="${p.image}" class="product-image">
             <h3>${escapeHtml(p.title)}</h3>
@@ -20,7 +22,9 @@ function renderWishlistPage() {
               </button>
             </div>
           </div>
-        `).join("")}
+        `
+          )
+          .join("")}
       </div>
     </div>
   `;

@@ -4,52 +4,78 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MiniMart</title>
-  <link rel="stylesheet" href="./css/style.css" />
-  <link rel="stylesheet" href="./css/button-styles.css" />
-    <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/button-styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <header>
-  <div class="nav-container">
-    <div class="logo" id="logo">MiniMart</div>
+      <div class="nav-container">
+        <div class="logo" id="logo">MiniMart</div>
 
-    <div class="nav-main">
-      <button class="mobile-menu-btn" aria-label="Menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+        <div class="nav-main">
+          <button class="mobile-menu-btn" aria-label="Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
 
-      <nav class="categories-menu">
-        <ul class="categories-list">
-          <li><button class="category-btn" data-category="jewelery">JEWELRY</button></li>
-          <li><button class="category-btn" data-category="electronics">ELECTRONICS</button></li>
-          <li class="has-submenu">
-            <button class="category-btn" data-category="clothes">CLOTHES</button>
-            <ul class="submenu">
-              <li><button class="subcategory-btn" data-subcategory="men's clothing">MEN'S</button></li>
-              <li><button class="subcategory-btn" data-subcategory="women's clothing">WOMEN'S</button></li>
+          <nav class="categories-menu">
+            <ul class="categories-list">
+              <li>
+                <button class="category-btn" data-category="jewelery">
+                  JEWELRY
+                </button>
+              </li>
+              <li>
+                <button class="category-btn" data-category="electronics">
+                  ELECTRONICS
+                </button>
+              </li>
+              <li class="has-submenu">
+                <button class="category-btn" data-category="clothes">
+                  CLOTHES
+                </button>
+                <ul class="submenu">
+                  <li>
+                    <button
+                      class="subcategory-btn"
+                      data-subcategory="men's clothing"
+                    >
+                      MEN'S
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      class="subcategory-btn"
+                      data-subcategory="women's clothing"
+                    >
+                      WOMEN'S
+                    </button>
+                  </li>
+                </ul>
+              </li>
             </ul>
-          </li>
-        </ul>
-      </nav>
+          </nav>
 
-      <div class="search-wrapper">
-        <input type="search" id="search" placeholder="Search products...">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <div class="search-wrapper">
+            <input type="search" id="search" placeholder="Search products..." />
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          </div>
+
+          <div class="nav-icons">
+            <i class="fa-regular fa-heart" id="nav-heart"></i>
+            <i class="fa-solid fa-cart-shopping" id="nav-cart"></i>
+          </div>
+        </div>
       </div>
+    </header>
 
-      <div class="nav-icons">
-        <i class="fa-regular fa-heart" id="nav-heart"></i>
-        <i class="fa-solid fa-cart-shopping" id="nav-cart"></i>
-      </div>
-    </div>
-  </div>
-</header>
-
-<div id="products-container"></div>
-  <script src="./js/common.js"></script>
-  <script src="./js/cart-wishlist.js"></script>
-  <script src="./js/rendering.js"></script>
-  <script src="./js/index.js"></script>
+    <div id="products-container"></div>
+    <script src="./js/common.js"></script>
+    <script src="./js/cart-wishlist.js"></script>
+    <script src="./js/rendering.js"></script>
+    <script src="./js/index.js"></script>
   </body>
 </html>

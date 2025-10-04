@@ -1,10 +1,10 @@
 // Common functions and variables used across multiple pages
 
 // Constants
-const CARD_MIN_WIDTH = 280; // px - the card minimum width used for fit calculation
-const MIN_GAP = 8; // px - minimum allowed gap between items
-const MAX_GAP = 24; // px - maximum reasonable gap
-const MAX_VISIBLE = 4; // maximum items to show on wide screens
+const CARD_MIN_WIDTH = 280;
+const MIN_GAP = 8;
+const MAX_GAP = 24;
+const MAX_VISIBLE = 4;
 
 // Shared variables
 let products = [];
@@ -25,7 +25,7 @@ function escapeHtml(text) {
 }
 
 function getVisibleCountForWidth(availableWidth) {
-  const GAP = 24; // Fixed gap size
+  const GAP = 24;
   
   // Calculate widths for different numbers of items
   const width4 = (CARD_MIN_WIDTH * 4) + (GAP * 3); // 4 items + 3 gaps
@@ -35,29 +35,13 @@ function getVisibleCountForWidth(availableWidth) {
   
   // Return exact fits based on available width
   if (availableWidth >= width4) {
-    return {
-      visibleCount: 4,
-      gap: GAP,
-      exactWidth: width4
-    };
+    return { visibleCount: 4, gap: GAP, exactWidth: width4 };
   } else if (availableWidth >= width3) {
-    return {
-      visibleCount: 3,
-      gap: GAP,
-      exactWidth: width3
-    };
+    return { visibleCount: 3, gap: GAP, exactWidth: width3 };
   } else if (availableWidth >= width2) {
-    return {
-      visibleCount: 2,
-      gap: GAP,
-      exactWidth: width2
-    };
+    return { visibleCount: 2, gap: GAP, exactWidth: width2 };
   } else {
-    return {
-      visibleCount: 1,
-      gap: 0,
-      exactWidth: width1
-    };
+    return { visibleCount: 1, gap: 0, exactWidth: width1 };
   }
 }
 
